@@ -1,10 +1,11 @@
-import { createMemo, createResource, createSignal, For, Show } from 'solid-js'
+import { createEffect, createMemo, createResource, createSignal, For, Show } from 'solid-js'
 import type { Models } from 'appwrite'
 import { useNavigate } from '@solidjs/router'
 import { appwriteConfig, databases, Query } from '../lib/appwrite'
 import { useSession } from '../context/session'
 import { coverUrlFor } from '../lib/covers'
-import { loadFavoriteBookIds, toggleFavoriteBookId } from '../lib/favorites'
+import { migrateFavoritesToCloud, toggleFavoriteBookIdCloud } from '../lib/favorites'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 type BookDoc = Models.Document & {
   title: string
@@ -26,7 +27,21 @@ export default function FavoritesPage() {
   const session = useSession()
   const navigate = useNavigate()
 
-  const [favoriteIds, setFavoriteIds] = createSignal<Set<string>>(loadFavoriteBookIds())
+  const [favoriteIds, setFavoriteIds] = createSignal<Set<string>>(new Set())
+
+  createEffect(() => {
+    const u = session.user()
+    if (!u) {
+      setFavoriteIds(new Set<string>())
+      return
+    }
+
+    void migrateFavoritesToCloud()
+      .then((ids) => setFavoriteIds(ids))
+      .catch(() => {
+        // ignore
+      })
+  })
 
   const [books] = createResource(async () => {
     const userId = session.user()?.$id
@@ -64,7 +79,7 @@ export default function FavoritesPage() {
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
       <aside
-        class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
+        class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
         data-purpose="sidebar-navigation"
       >
         <div class="p-6">
@@ -130,9 +145,9 @@ export default function FavoritesPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="favorites-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">Favorites</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">Favorites</h2>
             <p class="text-sm text-gray-500 mt-1">Your curated collection of most-loved books.</p>
           </div>
           <div class="flex items-center space-x-4">
@@ -163,7 +178,7 @@ export default function FavoritesPage() {
           </div>
         </header>
 
-        <div class="px-10 pb-10 pt-8">
+        <div class="px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-8">
           <div class="flex justify-between items-end mb-8">
             <div class="flex space-x-8">
               <div class="text-center sm:text-left">
@@ -189,7 +204,7 @@ export default function FavoritesPage() {
             </div>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
             <Show when={!books.loading} fallback={<div class="text-sm text-gray-500">Loading…</div>}>
               <For each={favoriteBooks()}>
                 {(b) => {
@@ -219,7 +234,13 @@ export default function FavoritesPage() {
                         <button
                           class="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-md rounded-full text-red-500 shadow-sm hover:scale-110 transition-transform z-10"
                           type="button"
-                          onClick={() => setFavoriteIds(toggleFavoriteBookId(favoriteIds(), b.$id))}
+                          onClick={() => {
+                            void toggleFavoriteBookIdCloud(b.$id)
+                              .then((ids) => setFavoriteIds(ids))
+                              .catch(() => {
+                                // ignore
+                              })
+                          }}
                         >
                           <span class="material-symbols-outlined text-[20px] fill-current">favorite</span>
                         </button>
@@ -267,6 +288,8 @@ export default function FavoritesPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }

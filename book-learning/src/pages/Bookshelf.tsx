@@ -1,10 +1,11 @@
-import { createMemo, createResource, createSignal, For, Show } from 'solid-js'
+import { createEffect, createMemo, createResource, createSignal, For, Show } from 'solid-js'
 import type { Models } from 'appwrite'
 import { useNavigate } from '@solidjs/router'
 import { appwriteConfig, databases, Query } from '../lib/appwrite'
 import { useSession } from '../context/session'
 import { coverUrlFor } from '../lib/covers'
-import { loadFavoriteBookIds, toggleFavoriteBookId } from '../lib/favorites'
+import { migrateFavoritesToCloud, toggleFavoriteBookIdCloud } from '../lib/favorites'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 type BookDoc = Models.Document & {
   title: string
@@ -45,7 +46,21 @@ export default function BookshelfPage() {
   const [genreFilter, setGenreFilter] = createSignal<string>('all')
   const [sortBy, setSortBy] = createSignal<'recent' | 'title'>('recent')
 
-  const [favoriteIds, setFavoriteIds] = createSignal<Set<string>>(loadFavoriteBookIds())
+  const [favoriteIds, setFavoriteIds] = createSignal<Set<string>>(new Set())
+
+  createEffect(() => {
+    const u = session.user()
+    if (!u) {
+      setFavoriteIds(new Set<string>())
+      return
+    }
+
+    void migrateFavoritesToCloud()
+      .then((ids) => setFavoriteIds(ids))
+      .catch(() => {
+        // ignore
+      })
+  })
 
   const [books] = createResource(async () => {
     const userId = session.user()?.$id
@@ -154,7 +169,7 @@ export default function BookshelfPage() {
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
       <aside
-        class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
+        class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
         data-purpose="sidebar-navigation"
       >
         <div class="p-6">
@@ -220,9 +235,9 @@ export default function BookshelfPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="bookshelf-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">My Bookshelf</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">My Bookshelf</h2>
             <p class="text-sm text-gray-500 mt-1">Manage and track your entire library</p>
           </div>
           <div class="flex items-center space-x-4">
@@ -250,7 +265,7 @@ export default function BookshelfPage() {
           </div>
         </header>
 
-        <div class="px-10 pb-10 space-y-6">
+        <div class="px-4 pb-24 md:px-10 md:pb-10 space-y-6">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
             <div class="relative w-full md:w-96">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -359,7 +374,11 @@ export default function BookshelfPage() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation()
-                              setFavoriteIds(toggleFavoriteBookId(favoriteIds(), b.$id))
+                              void toggleFavoriteBookIdCloud(b.$id)
+                                .then((ids) => setFavoriteIds(ids))
+                                .catch(() => {
+                                  // ignore
+                                })
                             }}
                           >
                             <span
@@ -447,6 +466,8 @@ export default function BookshelfPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }

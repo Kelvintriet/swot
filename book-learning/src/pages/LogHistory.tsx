@@ -3,6 +3,7 @@ import type { Models } from 'appwrite'
 import { appwriteConfig, databases, Query } from '../lib/appwrite'
 import { useSession } from '../context/session'
 import { coverUrlFor } from '../lib/covers'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 type BookDoc = Models.Document & {
   title: string
@@ -217,7 +218,7 @@ export default function LogHistoryPage() {
 
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
-      <aside class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto" data-purpose="sidebar-navigation">
+      <aside class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto" data-purpose="sidebar-navigation">
         <div class="p-6">
           <div class="mb-10">
             <h1 class="text-xl font-semibold tracking-tight">BookTracker</h1>
@@ -281,9 +282,9 @@ export default function LogHistoryPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="dashboard-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">Log History</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">Log History</h2>
             <p class="text-sm text-gray-500 mt-1">Track your reading journey and activities over time.</p>
           </div>
           <div class="flex items-center space-x-4">
@@ -321,7 +322,7 @@ export default function LogHistoryPage() {
           </div>
         </header>
 
-        <div class="px-10 pb-10 pt-4 space-y-6">
+        <div class="px-4 pb-24 pt-4 md:px-10 md:pb-10 space-y-6">
           <div class="max-w-4xl mx-auto">
             <Show when={!(books.loading || logs.loading || words.loading)} fallback={
               <div class="text-sm text-gray-500">Loading…</div>
@@ -521,6 +522,8 @@ export default function LogHistoryPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }

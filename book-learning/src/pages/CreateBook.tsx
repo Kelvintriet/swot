@@ -2,6 +2,7 @@ import { createSignal, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 import { appwriteConfig, databases, ID, Permission, Role, storage } from '../lib/appwrite'
 import { useSession } from '../context/session'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 function toIsoDateOrUndefined(value: string) {
   const trimmed = value.trim()
@@ -118,7 +119,7 @@ export default function CreateBookPage() {
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
       <aside
-        class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
+        class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
         data-purpose="sidebar-navigation"
       >
         <div class="p-6">
@@ -184,9 +185,9 @@ export default function CreateBookPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="bookshelf-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">Add Book</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">Add Book</h2>
             <p class="text-sm text-gray-500 mt-1">Create a new book in your bookshelf.</p>
           </div>
           <div class="flex items-center space-x-4">
@@ -214,7 +215,7 @@ export default function CreateBookPage() {
           </div>
         </header>
 
-        <div class="px-10 pb-10 pt-8">
+        <div class="px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-8">
           <div class="max-w-3xl">
             <Show when={error()}>
               <div class="mb-6 bg-white border border-red-100 text-red-700 rounded-xl p-4 text-sm shadow-sm">
@@ -381,6 +382,8 @@ export default function CreateBookPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }

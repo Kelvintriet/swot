@@ -2,6 +2,7 @@ import { createEffect, createMemo, createSignal, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 import { useSession } from '../context/session'
 import { account } from '../lib/appwrite'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 export default function SettingsPage() {
   const session = useSession()
@@ -169,7 +170,7 @@ export default function SettingsPage() {
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
       <aside
-        class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
+        class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
         data-purpose="sidebar-navigation"
       >
         <div class="p-6">
@@ -249,9 +250,9 @@ export default function SettingsPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="settings-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">Settings</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900">Settings</h2>
           </div>
           <div class="flex items-center space-x-4">
             <button class="text-gray-500 hover:text-gray-700 focus:outline-none relative" type="button">
@@ -287,7 +288,7 @@ export default function SettingsPage() {
           </div>
         </header>
 
-        <div class="px-10 py-8 space-y-8 max-w-5xl mx-auto">
+        <div class="px-4 py-6 pb-24 md:px-10 md:py-8 md:pb-10 space-y-8 max-w-5xl mx-auto">
           <section>
             <div class="mb-4">
               <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
@@ -539,6 +540,8 @@ export default function SettingsPage() {
           </section>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }

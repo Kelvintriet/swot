@@ -112,6 +112,20 @@ export default function LibraryPage() {
     setSearchParams({ create: undefined } as any)
   })
 
+  createEffect(() => {
+    if (pickBookMode() == null) return
+
+    const prevBodyOverflow = document.body.style.overflow
+    const prevHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow
+      document.documentElement.style.overflow = prevHtmlOverflow
+    }
+  })
+
   const goCreateForBook = (bookId: string) => {
     const mode = pickBookMode()
     if (!mode) return
@@ -283,7 +297,7 @@ export default function LibraryPage() {
         </div>
       </section>
 
-      <div class="fixed bottom-6 right-6 z-50">
+      <div class="hidden md:block fixed bottom-6 right-6 z-50">
         <div class="relative">
           <Show when={createMenuOpen()}>
             <div class="absolute bottom-14 right-0 w-72 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
@@ -332,7 +346,7 @@ export default function LibraryPage() {
         <div class="fixed inset-0 z-40">
           <div class="absolute inset-0 bg-black/30" onClick={() => setPickBookMode(null)} />
           <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-4">
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-xl w-full max-w-lg overflow-hidden max-h-[80vh] flex flex-col">
               <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div>
                   <p class="text-sm font-semibold text-gray-900">Pick a book</p>
@@ -349,7 +363,7 @@ export default function LibraryPage() {
                 </button>
               </div>
 
-              <div class="max-h-80 overflow-y-auto">
+              <div class="flex-1 overflow-y-auto overscroll-contain">
                 <Show when={!books.loading} fallback={<div class="p-4 text-sm text-gray-500">Loading…</div>}>
                   <Show
                     when={(books() ?? []).length > 0}
