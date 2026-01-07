@@ -4,7 +4,7 @@ import { useNavigate } from '@solidjs/router'
 import { appwriteConfig, databases, Query } from '../lib/appwrite'
 import { useSession } from '../context/session'
 import { coverUrlFor } from '../lib/covers'
-import { migrateFavoritesToCloud, toggleFavoriteBookIdCloud } from '../lib/favorites'
+import { loadFavoriteBookIdsCloud, toggleFavoriteBookIdCloud } from '../lib/favorites'
 import MobileBottomNav from '../components/MobileBottomNav'
 
 type BookDoc = Models.Document & {
@@ -55,7 +55,7 @@ export default function BookshelfPage() {
       return
     }
 
-    void migrateFavoritesToCloud()
+    void loadFavoriteBookIdsCloud()
       .then((ids) => setFavoriteIds(ids))
       .catch(() => {
         // ignore

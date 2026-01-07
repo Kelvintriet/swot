@@ -30,12 +30,22 @@ export default function SettingsPage() {
   const [newFollowers, setNewFollowers] = createSignal(true)
   const [hardWordReminders, setHardWordReminders] = createSignal(false)
 
+  const [seededUserId, setSeededUserId] = createSignal<string | null>(null)
+
   createEffect(() => {
     const u = session.user()
-    if (!u) return
-    if (!displayName().trim()) setDisplayName(u.name ?? '')
-    if (!email().trim()) setEmail(u.email ?? '')
-    if (!bio().trim()) setBio((u.prefs?.bio as string | undefined) ?? '')
+    if (!u) {
+      setSeededUserId(null)
+      return
+    }
+
+    const id = String(u.$id ?? '')
+    if (seededUserId() === id) return
+
+    setDisplayName(u.name ?? '')
+    setEmail(u.email ?? '')
+    setBio((u.prefs?.bio as string | undefined) ?? '')
+    setSeededUserId(id)
   })
 
   const isValidEmail = (v: string) => {
@@ -289,6 +299,25 @@ export default function SettingsPage() {
         </header>
 
         <div class="px-4 py-6 pb-24 md:px-10 md:py-8 md:pb-10 space-y-8 max-w-5xl mx-auto">
+          <div class="md:hidden">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+              <button
+                type="button"
+                class="w-full px-6 py-4 text-left flex items-center justify-between"
+                onClick={async () => {
+                  await session.logout()
+                  navigate('/login')
+                }}
+              >
+                <div>
+                  <div class="text-sm font-semibold text-gray-900">Log out</div>
+                  <div class="text-xs text-gray-500">Sign out of this device</div>
+                </div>
+                <span class="text-xs font-semibold text-gray-400">→</span>
+              </button>
+            </div>
+          </div>
+
           <section>
             <div class="mb-4">
               <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>

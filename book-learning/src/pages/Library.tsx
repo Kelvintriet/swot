@@ -343,7 +343,7 @@ export default function LibraryPage() {
       </div>
 
       <Show when={pickBookMode() != null}>
-        <div class="fixed inset-0 z-40">
+        <div class="fixed inset-0 z-[80]">
           <div class="absolute inset-0 bg-black/30" onClick={() => setPickBookMode(null)} />
           <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center p-4">
             <div class="bg-white rounded-2xl border border-gray-200 shadow-xl w-full max-w-lg overflow-hidden max-h-[80vh] flex flex-col">
@@ -363,7 +363,10 @@ export default function LibraryPage() {
                 </button>
               </div>
 
-              <div class="flex-1 overflow-y-auto overscroll-contain">
+              <div
+                class="flex-1 overflow-y-auto overscroll-contain"
+                style={{ '-webkit-overflow-scrolling': 'touch' }}
+              >
                 <Show when={!books.loading} fallback={<div class="p-4 text-sm text-gray-500">Loading…</div>}>
                   <Show
                     when={(books() ?? []).length > 0}
