@@ -278,9 +278,6 @@ export default function CreateBookPage() {
                         class="h-24 w-16 object-cover rounded shadow-sm border border-gray-200"
                         src={coverPreviewUrl() ?? ''}
                       />
-                      <p class="text-xs text-gray-500">
-                        Cover upload saves to Appwrite Storage (requires `VITE_APPWRITE_STORAGE_BUCKET_ID`).
-                      </p>
                     </div>
                   </Show>
                 </div>
