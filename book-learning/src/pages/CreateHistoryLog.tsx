@@ -4,6 +4,7 @@ import type { Models } from 'appwrite'
 import { appwriteConfig, databases, ID, Permission, Role } from '../lib/appwrite'
 import { useSession } from '../context/session'
 import { toLocalDateTimeInputValue } from '../lib/dates'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 type BookDoc = Models.Document & {
   title: string
@@ -82,7 +83,7 @@ export default function CreateHistoryLogPage() {
   return (
     <div class="bg-mainBg font-sans text-textPrimary h-screen flex overflow-hidden">
       <aside
-        class="w-64 bg-sidebar border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
+        class="hidden md:flex w-64 bg-sidebar border-r border-gray-200 flex-col justify-between flex-shrink-0 h-full overflow-y-auto"
         data-purpose="sidebar-navigation"
       >
         <div class="p-6">
@@ -148,7 +149,7 @@ export default function CreateHistoryLogPage() {
       </aside>
 
       <main class="flex-1 overflow-y-auto" data-purpose="dashboard-content">
-        <header class="flex justify-between items-center py-6 px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
+        <header class="flex justify-between items-center py-4 px-4 md:py-6 md:px-10 sticky top-0 z-40 border-b border-gray-100 bg-mainBg bg-opacity-90 backdrop-blur-md backdrop-saturate-150">
           <div>
             <h2 class="text-2xl font-bold text-gray-900">Create History Log</h2>
             <p class="text-sm text-gray-500 mt-1">
@@ -161,7 +162,7 @@ export default function CreateHistoryLogPage() {
           </div>
         </header>
 
-        <div class="px-10 pb-10 pt-8">
+        <div class="px-4 py-6 pb-24 md:px-10 md:py-8 md:pb-10">
           <div class="max-w-3xl">
             <Show when={error()}>
               <div class="mb-6 bg-white border border-red-100 text-red-700 rounded-xl p-4 text-sm shadow-sm">
@@ -214,6 +215,8 @@ export default function CreateHistoryLogPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav />
     </div>
   )
 }
