@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+*.log
+
+# Env (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Editors
+.vscode/
+.idea/
+
+# Stitch
+stitch_add_book_history_dashboard/
